@@ -1,25 +1,20 @@
 import matplotlib.pyplot as plt # for plotting
 import numpy as np # for transformation
-import csv
-import os
-import time
 import pandas as pd
 from PIL import Image
 import cv2
 import torch # PyTorch package
-import torchvision # load datasets
 import torchvision.transforms as transforms # transform data
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn # basic building block for neural neteorks
-import torch.nn.functional as F # import convolution functions like Relu
-import torch.optim as optim # optimzer
 
-def edit_frame(frame, preds):
-    filepath = ['cap','led','none']
-    int(preds) # just in case because idk
-    graphic = filepath[preds]
-
-    pass
+# def edit_frame(frame, preds):
+#     # frame = transforms.Compose([transforms.ToPILImage()])  
+#     filepath = ['cap1.png','led1.png','nope1.png']
+#     preds_num = int(preds) # just in case because idk
+#     graphic = Image.open(filepath[preds_num])
+#     graphic = graphic.load()
+#     overlay = cv2.addWeighted(frame, 1, graphic, 0.5, 0)
+    # return overlay
 
 class cnn(nn.Module):
     def __init__(self):
@@ -30,8 +25,7 @@ class cnn(nn.Module):
         self.conv2 = nn.Conv2d(32, 64, kernel_size = 3, stride = 1)
         # self.conv22 = nn.Conv2d(64, 64, kernel_size = 3, stride = 1)
         self.pool2 = nn.MaxPool2d(2,2)
-        self.fc1 = nn.Linear(1193216, 64) # deploy on Tiannas comp
-        # self.fc1 = nn.Linear(8198656, 64) # deploy on Lilys comp
+        self.fc1 = nn.Linear(8198656, 64) # deploy on Lilys comp
         self.relu1 = nn.ReLU()
         # self.fc2 = nn.Linear(120, 84)
         # self.relu2 = nn.ReLU()
@@ -53,7 +47,7 @@ class cnn(nn.Module):
         return img
 
 if __name__ == '__main__':
-    path = path # insert your own path here
+    path = 'C:\\Users\\lilyf\\Documents\\WicHacks2024\\15.pth'
     saved_weights = torch.load(path, map_location=torch.device('cpu'))
     model = cnn()
     model.load_state_dict(saved_weights)
@@ -61,6 +55,8 @@ if __name__ == '__main__':
     classes = ['capacitor', 'led', 'none']
     # define a video capture object 
     vid = cv2.VideoCapture(0)
+    vid.set(3, 1920)
+    vid.set(4, 1080)
     transform = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor(),
@@ -71,10 +67,10 @@ if __name__ == '__main__':
         # Capture the video frame 
         # by frame 
         ret, frame = vid.read()
-        frame = transform(frame).unsqueeze(0)
+        frame_tensor = transform(frame).unsqueeze(0)
         
         with torch.no_grad():
-            outputs = model(frame)
+            outputs = model(frame_tensor)
             _, preds = torch.max(outputs, 1)
             # Display the resulting frame 
             # result = edit_frame(frame, preds)
