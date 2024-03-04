@@ -47,7 +47,7 @@ class cnn(nn.Module):
         return img
 
 if __name__ == '__main__':
-    path = 'C:\\Users\\lilyf\\Documents\\WicHacks2024\\15.pth'
+    path = "your path here"
     saved_weights = torch.load(path, map_location=torch.device('cpu'))
     model = cnn()
     model.load_state_dict(saved_weights)
